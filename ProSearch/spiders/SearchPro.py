@@ -97,12 +97,15 @@ class SearchproSpider(scrapy.Spider):
             # 所属系统
             item['systloc'] = node.xpath('./td[11]/span/text()').extract_first()
             yield item
-
+            
         # 匹配下一页的数据
-        if '下一页' in response.xpath("//div[@class='page clear']/a").extract():
-            self.page += 1
-            n_url = self.url + '?' + 'xmname={}&p={}'.format(formdata['xmname'], self.page)
-            yield scrapy.Request(url=n_url, callback=self.parse, meta={'formdata': formdata})
+        a = response.xpath("//div[@class='page clear']/a").extract()
+        for i in range(len(a)):
+            if '下一页' in a[i]:	
+                self.page += 1
+                n_url = self.url + '?' + 'xmname={}&p={}'.format(formdata['xmname'], self.page)
+                print(n_url)         
+                yield scrapy.Request(url=n_url, callback=self.parse, meta={'formdata': formdata})
 
         # 匹配其他年份的数据
         searcy_year = int(formdata['lxtime'])
